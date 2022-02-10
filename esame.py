@@ -1,6 +1,7 @@
 from datetime import datetime
 import os
 
+
 class ExamException(Exception):
     pass
 
@@ -61,6 +62,7 @@ class CSVFile():
 
 
 class CSVTimeSeriesFile(CSVFile):
+
     def get_data(self):
         #Creo una lista con i nomi delle colonne che  mi interssano
         columns_list = ['date','passengers']
@@ -86,7 +88,7 @@ class CSVTimeSeriesFile(CSVFile):
 
         #Trasformo i datetime in stringhe
         final_list = [[element[0].strftime('%Y-%m'),element[1]] for element in converted_data]
-
+        
         return final_list
 
 def compute_avg_monthly_difference(time_series,first_year,last_year):
@@ -159,7 +161,7 @@ def compute_avg_monthly_difference(time_series,first_year,last_year):
                     #faccio la differnfa del numero dei passeggeri
                     diff = groupbymonth[j+1][1]-groupbymonth[j][1]
                     differences.append(diff)
-
+            
             #se c'è solo una differenza
             if (len(differences)==1):
                 avg_month = differences[0]
@@ -213,7 +215,10 @@ def create_time_series (starting_list, date_column=0, value_column=1):
         raise ExamException(f"Error! Columns position value should be positive")
     
     #controllo se tutti i valori sono interi
-    value_type_isok = all(isinstance(row[1],int) and row[1]>0 for row in starting_list)
+    try:
+        value_type_isok = all(isinstance(row[1],int) and row[1]>0 for row in starting_list)
+    except Exception:
+        value_type_isok = False
     
     #controllo se tutte le date sono nel formatto corretto
     try:
@@ -257,7 +262,7 @@ def create_time_series (starting_list, date_column=0, value_column=1):
                             converted_row.append(value)
                     except Exception:
                         break
-
+            
             if len(converted_row) == 2:
             #Se la lista contine già dei dati
                 if len(time_series)>1:
@@ -278,11 +283,11 @@ def create_time_series (starting_list, date_column=0, value_column=1):
 #input value
 file_name = 'data.csv'
 first_year = '1949'
-last_year = '1954'
+last_year = '1951'
 
 time_series_file = CSVTimeSeriesFile(name=file_name)
 time_series = time_series_file.get_data()
-avg=compute_avg_monthly_difference(time_series, first_year, last_year)
+avg = compute_avg_monthly_difference(time_series, first_year, last_year)
 
-print(f"Variazione media del numero di passeggeri per ogni mese: (periodo {first_year} - {last_year}")
+print(f"Variazione media del numero di passeggeri per ogni mese: (periodo {first_year} - {last_year})")
 print(avg)
