@@ -133,19 +133,15 @@ def compute_avg_monthly_difference(time_series,first_year,last_year):
     if last_y != my_list[-1][0].year:
         raise ExamException(f'Last_year is not in list')
 
-    
-    
-    # Preparo lista per ragruppare i dati per mese
-    groupbymonth = []
-    #Preparo lista per contenere le differenze
-    differnces = []
     #Preparo lista per contenere le medie
     avg = []
     
     #Per ogni mese
     for i in range(12):
+        # Preparo lista per ragruppare i dati per mese
         groupbymonth = []
-        differnces = []
+        #Preparo lista per contenere le differenze
+        differences = []
         for item in my_list:
             #Se il mese dell'elemento corrisponde al mese corrente
             if item[0].month == i+1:
@@ -162,18 +158,22 @@ def compute_avg_monthly_difference(time_series,first_year,last_year):
                 if(groupbymonth[j+1][0].year == groupbymonth[j][0].year+1):
                     #faccio la differnfa del numero dei passeggeri
                     diff = groupbymonth[j+1][1]-groupbymonth[j][1]
-                    differnces.append(diff)
-            #se c'è almeno un elemnto
-            if (len(differnces)>1):
-            #calcolo la media delle differnze del mese
-                avg_month = sum(differnces)/len(differnces)
+                    differences.append(diff)
+
+            #se c'è solo una differenza
+            if (len(differences)==1):
+                avg_month = differences[0]
+                print(avg_month)
+            #se ci sono più differenze faccio la media
+            elif (len(differences)>1):
+                avg_month = sum(differences)/len(differences)
             else:
             #altirmenti la media sarà 0
                avg_month = 0.0
+           
             #inserisco la media del mese nella lista finale
             avg.append(float(avg_month))
             #elimino i dati dentro le liste provvisorie per fare i calcoli per il mese successivo
-          
    
     return avg
 
@@ -228,7 +228,6 @@ def create_time_series (starting_list, date_column=0, value_column=1):
             raise ExamException(f"List is not sorted")
         else:
             time_series = [[datetime.strptime(element[0],'%Y-%m'),element[1]] for element in starting_list]
-            print(okeo)
             #ritorno la lista così come sta:
             return time_series
     #altrimenti:
@@ -267,7 +266,7 @@ def create_time_series (starting_list, date_column=0, value_column=1):
                         raise ExamException (f"List is not sorted --> {time_series[-1][0]},{converted_row[0]} ")
 
                 time_series.append(converted_row) 
-    print(time_series)           
+         
     return time_series
     
 
@@ -279,10 +278,11 @@ def create_time_series (starting_list, date_column=0, value_column=1):
 #input value
 file_name = 'data.csv'
 first_year = '1949'
-last_year = '1950'
+last_year = '1954'
 
 time_series_file = CSVTimeSeriesFile(name=file_name)
-#time_series = time_series_file.get_data()
-
+time_series = time_series_file.get_data()
 avg=compute_avg_monthly_difference(time_series, first_year, last_year)
+
+print(f"Variazione media del numero di passeggeri per ogni mese: (periodo {first_year} - {last_year}")
 print(avg)
